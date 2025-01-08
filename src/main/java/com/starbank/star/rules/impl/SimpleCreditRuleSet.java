@@ -24,8 +24,8 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
 
         if (noCreditProducts && debitDeposits > debitSpending && debitSpending > 100000) {
             return Optional.of(new RecommendationDTO(
-                    "ab138afb-f3ba-4a93-b74f-0fcee86d447f",
                     "Simple Credit",
+                    "ab138afb-f3ba-4a93-b74f-0fcee86d447f",
                     "Откройте мир выгодных кредитов с нами!"
             ));
         }
