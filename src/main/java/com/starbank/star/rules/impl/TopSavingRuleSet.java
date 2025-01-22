@@ -25,8 +25,8 @@ public class TopSavingRuleSet implements RecommendationRuleSet {
 
         if ((debitDeposits >= 50000 || savingDeposits >= 50000) && debitDeposits > debitSpending) {
             return Optional.of(new RecommendationDTO(
-                    "59efc529-2fff-41af-baff-90ccd7402925",
                     "Top Saving",
+                    "59efc529-2fff-41af-baff-90ccd7402925",
                     "Откройте свою собственную «Копилку» с нашим банком!"
             ));
         }
