@@ -32,7 +32,14 @@ public class RulesService {
     }
 
     public Optional<Rules> getRuleById(UUID ruleId) {
+        String cacheKey = ruleId.toString();
+        Rules cachedRule = (Rules) cacheService.get(cacheKey);
+        if (cachedRule != null) {
+            return Optional.of(cachedRule);
+        }
 
-        return rulesRepository.findById(ruleId);
+        Optional<Rules> rule = rulesRepository.findById(ruleId);
+        rule.ifPresent(r -> cacheService.put(cacheKey, r));
+        return rule;
     }
 }
