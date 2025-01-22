@@ -1,0 +1,6 @@
+databaseChangeLog:
+  -include:
+    file: liquibase/scripts/transactions.sql
+
+    -include:
+      file: liquibase/scripts/rules.sql
