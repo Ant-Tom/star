@@ -3,7 +3,7 @@
 -- changeset kkatyshev:1
 
 CREATE TABLE users (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(15),
@@ -16,7 +16,7 @@ CREATE INDEX users_phone_index ON users (phone);
 -- changeset kkatyshev:2
 
 CREATE TABLE products (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(100) NOT NULL,
     description TEXT,
@@ -29,12 +29,14 @@ CREATE INDEX products_type_index ON products (type);
 -- changeset kkatyshev:3
 
 CREATE TABLE user_transactions (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    product_id UUID NOT NULL,
     transaction_date TIMESTAMP NOT NULL,
     amount DOUBLE,
-    type VARCHAR(50)
+    type VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE INDEX transactions_user_id_index ON user_transactions (user_id);

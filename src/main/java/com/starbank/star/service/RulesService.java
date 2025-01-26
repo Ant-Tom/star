@@ -1,9 +1,9 @@
 package com.starbank.star.service;
 
-import com.starbank.star.cache.CacheService;
 import com.starbank.star.entity.Rules;
 import com.starbank.star.rules.RulesRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,11 +12,9 @@ import java.util.UUID;
 public class RulesService {
 
     private final RulesRepository rulesRepository;
-    private final CacheService cacheService;
 
-    public RulesService(RulesRepository rulesRepository, CacheService cacheService) {
+    public RulesService(RulesRepository rulesRepository) {
         this.rulesRepository = rulesRepository;
-        this.cacheService = cacheService;
     }
 
     public Rules addRule(Rules rule) {
@@ -32,7 +30,6 @@ public class RulesService {
     }
 
     public Optional<Rules> getRuleById(UUID ruleId) {
-
         return rulesRepository.findById(ruleId);
     }
 }

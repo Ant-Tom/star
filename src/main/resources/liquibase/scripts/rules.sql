@@ -10,15 +10,15 @@ CREATE TABLE rules
     product_text TEXT
 );
 
-CREATE INDEX rules_product_id_index ON dynamic_rules (product_id);
+CREATE INDEX rules_product_id_index ON rules (product_id);
 
 CREATE TABLE rule_queries
 (
     rule_id    UUID         NOT NULL,
     query_type VARCHAR(255) NOT NULL,
-    arguments  TEXT         NOT NULL,
+    arguments  JSON         NOT NULL, -- Используем JSON для хранения списка аргументов
     negate     BOOLEAN      NOT NULL,
-    FOREIGN KEY (rule_id) REFERENCES dynamic_rules (id) ON DELETE CASCADE
+    FOREIGN KEY (rule_id) REFERENCES rules (id) ON DELETE CASCADE
 );
 
 CREATE INDEX rule_queries_query_type_index ON rule_queries (query_type);

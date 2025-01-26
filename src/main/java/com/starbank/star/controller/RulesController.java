@@ -30,6 +30,9 @@ public class RulesController {
 
     @DeleteMapping("/{ruleId}")
     public ResponseEntity<Void> deleteRule(@PathVariable UUID ruleId) {
+        if (!rulesService.getRuleById(ruleId).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
         rulesService.deleteRule(ruleId);
         return ResponseEntity.noContent().build();
     }
