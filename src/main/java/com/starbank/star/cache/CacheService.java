@@ -47,4 +47,10 @@ public class CacheService {
     public Double getTransactionSum(String key) {
         return transactionSumCache.getIfPresent(key);
     }
+
+    public void deleteCache () {
+        userOfCache.invalidateAll();
+        activeUserOfCache.invalidateAll();
+        transactionSumCache.invalidateAll();
+    }
 }
