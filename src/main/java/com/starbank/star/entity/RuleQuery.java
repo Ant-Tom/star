@@ -1,7 +1,7 @@
 package com.starbank.star.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import java.util.List;
 
@@ -11,23 +11,22 @@ public class RuleQuery {
     @Column(name = "query_type", nullable = false)
     private String queryType;
 
-    @ElementCollection
+    // Храним список аргументов в одном столбце с помощью конвертера
+    @Convert(converter = com.starbank.star.config.StringListConverter.class)
+    @Column(name = "arguments")
     private List<String> arguments;
 
     @Column(name = "negate", nullable = false)
     private boolean negate;
 
-    // Конструктор по умолчанию
     public RuleQuery() {}
 
-    // Конструктор с параметрами
     public RuleQuery(String queryType, List<String> arguments, boolean negate) {
         this.queryType = queryType;
         this.arguments = arguments;
         this.negate = negate;
     }
 
-    // Геттеры и сеттеры
     public String getQueryType() {
         return queryType;
     }

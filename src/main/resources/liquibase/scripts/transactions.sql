@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset kkatyshev:1
+-- resources/liquibase/scripts/transaction.sql
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,

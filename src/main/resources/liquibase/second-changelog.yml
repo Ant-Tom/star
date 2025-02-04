@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: your_name
+      changes:
+        - createTable:
+            tableName: dynamic_rules
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_text
+                  type: TEXT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 2
+      author: your_name
+      changes:
+        - createTable:
+            tableName: rule_queries
+            columns:
+              - column:
+                  name: rule_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: query_type
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: arguments
+                  type: JSON
+                  constraints:
+                    nullable: false
+              - column:
+                  name: negate
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_rule_queries_rule
+            baseTableName: rule_queries
+            baseColumnNames: rule_id
+            referencedTableName: dynamic_rules
+            referencedColumnNames: id
+            onDelete: CASCADE
