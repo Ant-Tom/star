@@ -2,9 +2,12 @@ package com.starbank.star.service;
 
 import com.starbank.star.DTO.RecommendationDTO;
 import com.starbank.star.entity.RuleQuery;
+import com.starbank.star.entity.RuleStats;
 import com.starbank.star.entity.Rules;
 import com.starbank.star.repository.RecommendationRepository;
 import com.starbank.star.rules.RecommendationRuleSet;
+import com.starbank.star.rules.RuleStatsRepository;
+import com.starbank.star.service.RulesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,11 +24,16 @@ public class RecommendationService {
     private final List<RecommendationRuleSet> ruleSets;
     private final RulesService rulesService;
     private final RecommendationRepository repository;
+    private final RuleStatsRepository ruleStatsRepository;
 
-    public RecommendationService(List<RecommendationRuleSet> ruleSets, RulesService rulesService, RecommendationRepository repository) {
+    public RecommendationService(List<RecommendationRuleSet> ruleSets,
+                                 RulesService rulesService,
+                                 RecommendationRepository repository,
+                                 RuleStatsRepository ruleStatsRepository) {
         this.ruleSets = ruleSets;
         this.rulesService = rulesService;
         this.repository = repository;
+        this.ruleStatsRepository = ruleStatsRepository;
     }
 
     public List<RecommendationDTO> getRecommendations(UUID userId) {
@@ -48,12 +56,19 @@ public class RecommendationService {
                         rule.getProductId(),
                         rule.getProductText()
                 ));
+                updateRuleStats(rule.getProductName());
                 logger.debug("Added dynamic recommendation: {} for user: {}", rule.getProductName(), userId);
             }
         }
 
         logger.info("Total recommendations found for user {}: {}", userId, recommendations.size());
         return recommendations;
+    }
+
+    private void updateRuleStats(String ruleId) {
+        RuleStats stats = ruleStatsRepository.findById(ruleId).orElse(new RuleStats(ruleId, 0));
+        stats.increment();
+        ruleStatsRepository.save(stats);
     }
 
     private boolean checkDynamicRule(UUID userId, Rules rule) {

@@ -1,6 +1,5 @@
 -- liquibase formatted sql
-
--- changeset kkatyshev:1
+-- resources/liquibase/scripts/rules.sql
 
 CREATE TABLE rules
 (
