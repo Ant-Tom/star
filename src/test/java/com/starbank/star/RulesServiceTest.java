@@ -32,26 +32,31 @@ class RulesServiceTest {
     @Test
     void testAddRule() {
         Rules rule = new Rules();
+        rule.setId(UUID.randomUUID()); // Устанавливаем ID
         rule.setProductName("Test Rule");
         when(rulesRepository.save(rule)).thenReturn(rule);
 
         Rules savedRule = rulesService.addRule(rule);
 
         assertNotNull(savedRule);
+        assertNotNull(savedRule.getId()); // Проверяем, что ID не null
         assertEquals("Test Rule", savedRule.getProductName());
     }
 
     @Test
     void testGetAllRules() {
         Rules rule = new Rules();
+        rule.setId(UUID.randomUUID()); // Устанавливаем ID
         rule.setProductName("Test Rule");
         when(rulesRepository.findAll()).thenReturn(List.of(rule));
 
         List<Rules> rules = rulesService.getAllRules();
 
         assertEquals(1, rules.size());
+        assertNotNull(rules.get(0).getId()); // Проверяем, что ID не null
         assertEquals("Test Rule", rules.get(0).getProductName());
     }
+
 
     @Test
     void testDeleteRule() {
