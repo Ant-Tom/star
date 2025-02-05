@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,13 +34,18 @@ public class RecommendationController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/recommendation/{userId}")
-    public Map<String, Object> getRecommendations(
+    public ResponseEntity<Map<String, Object>> getRecommendations(
             @Parameter(description = "UUID of the user", required = true)
             @PathVariable String userId) {
-        List<RecommendationDTO> recommendations = recommendationService.getRecommendations(UUID.fromString(userId));
-        Map<String, Object> response = new HashMap<>();
-        response.put("user_id", userId);
-        response.put("recommendations", recommendations);
-        return response;
+        try {
+            UUID uuid = UUID.fromString(userId);
+            List<RecommendationDTO> recommendations = recommendationService.getRecommendations(uuid);
+            Map<String, Object> response = new HashMap<>();
+            response.put("user_id", userId);
+            response.put("recommendations", recommendations);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid UUID format"));
+        }
     }
 }
