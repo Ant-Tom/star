@@ -5,6 +5,7 @@ import com.starbank.star.entity.RuleQuery;
 import com.starbank.star.entity.Rules;
 import com.starbank.star.repository.RecommendationRepository;
 import com.starbank.star.rules.RecommendationRuleSet;
+import com.starbank.star.rules.RuleStatsRepository;
 import com.starbank.star.service.RecommendationService;
 import com.starbank.star.service.RulesService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,9 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationRepository repository;
 
+    @Mock
+    private RuleStatsRepository ruleStatsRepository;
+
     @InjectMocks
     private RecommendationService recommendationService;
 
@@ -42,25 +46,25 @@ class RecommendationServiceTest {
         UUID userId = UUID.randomUUID();
 
         // Мокируем статические правила
-        when(ruleSets.stream()).thenReturn(List.of(
-                (RecommendationRuleSet) userId1 -> Optional.of(new RecommendationDTO("Static Rule", "static-id", "Static Description"))
-        ).stream());
+        RecommendationRuleSet staticRuleSet = user -> Optional.of(new RecommendationDTO("Static Rule", "static-id", "Static Description"));
+        when(ruleSets.stream()).thenReturn(List.of(staticRuleSet).stream());
 
-        // Мокируем динамические правила
+        // Создаем динамическое правило
         Rules rule = new Rules();
+        rule.setId(UUID.randomUUID()); // Устанавливаем ID, чтобы избежать NullPointerException
         rule.setProductName("Dynamic Rule");
         rule.setProductId("dynamic-id");
         rule.setProductText("Dynamic Description");
-        rule.setRuleQueries(List.of(
-                new RuleQuery("USER_OF", List.of("CREDIT"), false)
-        ));
+        rule.setRuleQueries(List.of(new RuleQuery("USER_OF", List.of("CREDIT"), false)));
         when(rulesService.getAllRules()).thenReturn(List.of(rule));
 
         // Мокируем репозиторий
         when(repository.getTotalDepositAmountByType(userId.toString(), "CREDIT")).thenReturn(1000.0);
 
+        // Запускаем тестируемый метод
         List<RecommendationDTO> recommendations = recommendationService.getRecommendations(userId);
 
+        // Проверяем результат
         assertEquals(2, recommendations.size());
         assertEquals("Static Rule", recommendations.get(0).getName());
         assertEquals("Dynamic Rule", recommendations.get(1).getName());

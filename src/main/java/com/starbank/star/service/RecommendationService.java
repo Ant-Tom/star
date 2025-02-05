@@ -39,15 +39,14 @@ public class RecommendationService {
     public List<RecommendationDTO> getRecommendations(UUID userId) {
         logger.info("Fetching recommendations for user: {}", userId);
 
+        // Получаем рекомендации из набора статических правил
         List<RecommendationDTO> recommendations = ruleSets.stream()
                 .map(rule -> rule.apply(userId))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        logger.debug("Found {} static recommendations for user: {}", recommendations.size(), userId);
-
-        // Добавляем динамические правила
+        // Добавляем динамические правила из базы
         List<Rules> dynamicRules = rulesService.getAllRules();
         for (Rules rule : dynamicRules) {
             if (checkDynamicRule(userId, rule)) {
@@ -56,7 +55,8 @@ public class RecommendationService {
                         rule.getProductId(),
                         rule.getProductText()
                 ));
-                updateRuleStats(rule.getProductName());
+                // Используем идентификатор правила для обновления статистики
+                updateRuleStats(rule.getId().toString());
                 logger.debug("Added dynamic recommendation: {} for user: {}", rule.getProductName(), userId);
             }
         }
@@ -93,10 +93,12 @@ public class RecommendationService {
             case "ACTIVE_USER_OF":
                 return checkActiveUserOf(userId, query.getArguments().get(0));
             case "TRANSACTION_SUM_COMPARE":
-                return checkTransactionSumCompare(userId, query.getArguments().get(0), query.getArguments().get(1),
-                        query.getArguments().get(2), Integer.parseInt(query.getArguments().get(3)));
+                return checkTransactionSumCompare(userId, query.getArguments().get(0),
+                        query.getArguments().get(1), query.getArguments().get(2),
+                        Integer.parseInt(query.getArguments().get(3)));
             case "TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW":
-                return checkTransactionSumCompareDepositWithdraw(userId, query.getArguments().get(0), query.getArguments().get(1));
+                return checkTransactionSumCompareDepositWithdraw(userId, query.getArguments().get(0),
+                        query.getArguments().get(1));
             default:
                 logger.warn("Unknown query type: {}", query.getQueryType());
                 return false;
@@ -138,5 +140,13 @@ public class RecommendationService {
             case "<=": return depositSum <= withdrawSum;
             default: return false;
         }
+    }
+
+    // Пример метода для получения полного имени пользователя.
+    // Реальную реализацию необходимо заменить запросом к БД или внешней системе.
+    public String getUserFullName(UUID userId) {
+        // Если пользователь найден, вернуть "Имя Фамилия", иначе null.
+        // Здесь возвращаем фиктивное имя для демонстрации.
+        return "Иван Иванов";
     }
 }
