@@ -20,12 +20,12 @@ public class StarBankBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "${telegram.bot.username}";
+        return "${telegram.bot.username}"; // можно заменить на реальное имя, если необходимо
     }
 
     @Override
     public String getBotToken() {
-        return "${telegram.bot.token}";
+        return "${telegram.bot.token}";   // аналогично, можно использовать настройки из properties
     }
 
     @Override
@@ -34,11 +34,9 @@ public class StarBankBot extends TelegramLongPollingBot {
             Message message = update.getMessage();
             String chatId = message.getChatId().toString();
             String text = message.getText();
-
             if ("/start".equalsIgnoreCase(text)) {
                 sendMessage(chatId, "Добро пожаловать! Используйте команду /recommend username для получения рекомендаций.");
             } else if (text.startsWith("/recommend ")) {
-                // Извлекаем параметр (username). По ТЗ – это имя пользователя, но здесь мы ожидаем UUID.
                 String usernameParam = text.replace("/recommend ", "").trim();
                 handleRecommendation(chatId, usernameParam);
             } else {
@@ -49,15 +47,14 @@ public class StarBankBot extends TelegramLongPollingBot {
 
     private void handleRecommendation(String chatId, String usernameParam) {
         try {
-            // Попытка преобразовать параметр в UUID
+            // Если поиск ведется по UUID, можно преобразовать usernameParam в UUID;
+            // Если поиск по имени, можно изменить логику.
             UUID userId = UUID.fromString(usernameParam);
-            // Получаем полное имя пользователя (метод можно реализовать через поиск в БД или через внешний сервис)
             String fullName = recommendationService.getUserFullName(userId);
             if (fullName == null) {
                 sendMessage(chatId, "Пользователь не найден.");
                 return;
             }
-
             List<RecommendationDTO> recommendations = recommendationService.getRecommendations(userId);
             if (recommendations.isEmpty()) {
                 sendMessage(chatId, "Здравствуйте " + fullName + "!\nРекомендаций для вас пока нет.");
@@ -69,14 +66,14 @@ public class StarBankBot extends TelegramLongPollingBot {
                 sendMessage(chatId, response.toString());
             }
         } catch (IllegalArgumentException e) {
-            // Если параметр не является корректным UUID или поиск пользователя не дал результата
             sendMessage(chatId, "Пользователь не найден.");
         }
     }
 
     private void sendMessage(String chatId, String text) {
+        SendMessage message = new SendMessage(chatId, text);
         try {
-            execute(new SendMessage(chatId, text));
+            execute(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
